@@ -1,0 +1,89 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  font-family: "Abel", sans-serif;
+  --grass-color: #80d67fda;
+  --posion-color: #f170e7;
+  --fire-color: #ed791a;
+  --bug-color: #783207;
+  --water-color: #a3d1ff;
+  --fly-color: #e1e9f0;
+  --electric-color: #f5c800;
+  --normal-color: #f0ebeb;
+  --ground-color: #d99750;
+  --fairy--color: #f5b8ef;
+  --fighting--color: #f53737;
+  --psychic--color: #bc86dad8;
+  --rock-color: #444144d8;
+}
+h5 {
+  font-size: 2rem;
+  text-transform: capitalize;
+}
+div {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+span {
+  padding: 0px 10px;
+  margin: 1px;
+  border: 1px dotted black;
+  cursor: pointer;
+}
+
+#pokedex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.grass {
+  background: var(--grass-color);
+}
+
+.poison {
+  background: var(--posion-color);
+}
+
+.fire {
+  background: var(--fire-color);
+}
+.bug {
+  color: white;
+  background: var(--bug-color);
+}
+.water {
+  background: var(--water-color);
+}
+.flying {
+  background: var(--fly-color);
+}
+.electric {
+  background: var(--electric-color);
+}
+.normal {
+  background: var(--normal-color);
+}
+.ground {
+  background: var(--ground-color);
+}
+.fairy {
+  color: white;
+  background: var(--fairy--color);
+}
+.fighting {
+  /* color: white; */
+  background: var(--fighting--color);
+}
+.psychic {
+  background: var(--psychic--color);
+}
+.rock {
+  color: white;
+  background: var(--rock-color);
+}
