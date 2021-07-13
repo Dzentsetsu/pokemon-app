@@ -1,4 +1,5 @@
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
@@ -14,10 +15,72 @@
   --electric-color: #f5c800;
   --normal-color: #f0ebeb;
   --ground-color: #d99750;
-  --fairy--color: #f5b8ef;
-  --fighting--color: #f53737;
-  --psychic--color: #bc86dad8;
+  --fairy-color: #f5b8ef;
+  --fighting-color: #f53737;
+  --psychic-color: #bc86dad8;
   --rock-color: #444144d8;
+  --steel-color: #c0c0c0;
+  --dark-color: #2c2b2b;
+  --ghost-color: #7320c0;
+  --dragon-color: linear-gradient(180deg, #78bed3 50%, #a04e5a 50%);
+  --ice-color: #1d77cc;
+}
+body {
+  text-align: center;
+}
+
+header {
+  font-family: "Sarpanch", sans-serif;
+  font-size: 3rem;
+  text-align: center;
+}
+#input-wrapper {
+  width: fit-content;
+  height: fit-content;
+}
+#input-search {
+  margin: 0;
+  width: 400px;
+  height: 40px;
+}
+#input-btn {
+  vertical-align: top;
+
+  width: 60px;
+  height: 40px;
+}
+.heart {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+label {
+  font-size: 1.7rem;
+}
+
+/* body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+} */
+input {
+  width: 100%;
+  padding: 5px 15px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+}
+#pokedex {
+  /* height: 100vh; */
+}
+
+.circle-background {
+  background: rgba(245, 222, 179, 0.555);
+  border-radius: 50%;
+  margin: 0;
 }
 h5 {
   font-size: 2rem;
@@ -74,16 +137,35 @@ span {
 }
 .fairy {
   color: white;
-  background: var(--fairy--color);
+  background: var(--fairy-color);
 }
 .fighting {
   /* color: white; */
-  background: var(--fighting--color);
+  background: var(--fighting-color);
 }
 .psychic {
-  background: var(--psychic--color);
+  background: var(--psychic-color);
 }
 .rock {
   color: white;
   background: var(--rock-color);
+}
+.steel {
+  color: white;
+  background: var(--steel-color);
+}
+.dark {
+  color: whitesmoke;
+  background: var(--dark-color);
+}
+.ghost {
+  color: whitesmoke;
+  background: var(--ghost-color);
+}
+.dragon {
+  background: var(--dragon-color);
+}
+.ice {
+  color: whitesmoke;
+  background: var(--ice-color);
 }

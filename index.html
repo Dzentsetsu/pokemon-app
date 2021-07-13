@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="shortcut icon" href="favicon.ico" />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,10 +11,20 @@
       href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
       rel="stylesheet"
     />
+    <link href="https://fonts.googleapis.com/css2?family=Sarpanch&display=swap" rel="stylesheet"> 
+    <script src="https://kit.fontawesome.com/904665a92e.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/styles.css" />
-    <title>Document</title>
+    <title>Pokemon App</title>
   </head>
   <body>
+    <header>POKÉDEX</header>
+    
+      
+        <label for="search-input">Find your <span class="heart">&#x1F496</span> pokemon</label><br>
+        <div id="input-wrapper"></div>
+        <input type="text" id="input-search" placeholder="Type name of a pokemon"/><button id="input-btn"><i class="fas fa-search"></i></button>
+      </div>
+
     <section id="pokedex"></section>
   </body>
   <script src="js/main.js"></script>

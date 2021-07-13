@@ -3,6 +3,7 @@ const pokemon_img_endpoint = "https://pokeres.bastionbot.org/images/pokemon/";
 let pokemon_arr;
 var pokemon_real_arr = [];
 var test_arr = [1, 2, 3, 4];
+
 (async function getPokemon(num) {
   const url = pokemon_api_url + num;
 
@@ -10,21 +11,28 @@ var test_arr = [1, 2, 3, 4];
   const data = await obj.json();
 
   createPokemonCard(data);
+  console.log(data);
 })(1);
 
 function createPokemonCard(pokemonObj) {
   // Creating container for pokemon card
-  let card = document.createElement("div");
-  document.getElementById("pokedex").appendChild(card);
-  //   document.body.appendChild(card);
+  const fragment = document.createDocumentFragment();
+  const card = document.createElement("div");
+  const pokedexSection = document.getElementById("pokedex");
   card.classList.add("pokemon-card-container");
-
+  fragment.appendChild(card);
   // This line makes container have width of its child img
   card.style.width = "max-content";
 
+  //Creating empty div behind the img to style background
+  const epmtyDiv = document.createElement("div");
+  card.appendChild(epmtyDiv);
+  epmtyDiv.style.height = 210;
+  epmtyDiv.classList.add("circle-background");
+
   // Creating avatar for pokemon card from another API (cause png from there is way better)
-  let img = document.createElement("img");
-  card.appendChild(img);
+  const img = document.createElement("img");
+  epmtyDiv.appendChild(img);
   img.width = 210;
   img.height = 210;
   img.src = `${pokemon_img_endpoint}${pokemonObj.id}.png`;
@@ -41,22 +49,15 @@ function createPokemonCard(pokemonObj) {
   h5.innerText = `${pokemonObj.name}`;
   card.appendChild(h5);
 
-  // Getting every type this pokemon has in an array of strings
-  const getTypes = (pokemonObj) => {
-    let temp = [];
-    pokemonObj.types.forEach((element) => {
-      temp.push(element.type.name);
-    });
-
-    return temp;
-  };
-
-  const types = getTypes(pokemonObj);
+  // Creating Pokemon types
+  const types = getPokemonTypes(pokemonObj);
   const labels = makePokemonTypeLabels(types);
 
   for (let i = 0; i < labels.length; i++) {
     card.appendChild(labels[i]);
   }
+
+  pokedexSection.appendChild(fragment);
 }
 
 // Making Labels for every type this pokemon has
@@ -76,7 +77,8 @@ function makePokemonTypeLabels(types) {
   return temp;
 }
 
-async function first12Pokemons(limit = 0, offset = 12) {
+// This function fecthing Pokemons. limit - how many pokemons you want to get. offset is id offset
+async function fetchPokemons(limit = 0, offset = 10) {
   let data;
   if (Number.isInteger(limit) && Number.isInteger(offset)) {
     const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
@@ -87,13 +89,10 @@ async function first12Pokemons(limit = 0, offset = 12) {
     pokemon_arr.forEach((elem) => {
       getPokemon(elem);
     });
-
-    // console.log(pokemon_real_arr);
-
-    // console.log(pokemon_real_arr);
-  }
+  } else return;
 }
-first12Pokemons(15, 100);
+
+// fetchPokemons();
 
 setTimeout(doIT, 2000);
 
@@ -111,9 +110,11 @@ function doIT() {
   }
 }
 
-// let pokem = pokemons.results;
-// function createPokemons(pokemons) {
-//   pokemons.forEach((elem) => createPokemonCard(elem));
-// }
+function getPokemonTypes(pokemonObj) {
+  let temp = [];
+  pokemonObj.types.forEach((element) => {
+    temp.push(element.type.name);
+  });
 
-// createPokemons(pokemons);
+  return temp;
+}
