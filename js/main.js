@@ -1,19 +1,59 @@
+/*
+Below this comment we declare global variables
+*/
 const pokemon_api_url = "https://pokeapi.co/api/v2/pokemon/";
 const pokemon_img_endpoint = "https://pokeres.bastionbot.org/images/pokemon/";
-let pokemon_arr;
-var pokemon_real_arr = [];
-var test_arr = [1, 2, 3, 4];
+let numberOfClicks = 0;
+/*
+Above this comment we global variables
+*/
+////////////////////////////////////////////////////////
+/*
+Below this comment we declare async functions
+*/
 
-(async function getPokemon(num) {
+// This function fetches pokemon by specific id
+async function fetchPokemonByID(num) {
+  if (Number.isNaN(num)) return;
   const url = pokemon_api_url + num;
 
   const obj = await fetch(url);
   const data = await obj.json();
 
   createPokemonCard(data);
-  console.log(data);
-})(1);
+}
 
+// This function fetching random pokemon on DOMContentLoaded
+async function fetchRandomPokemon() {
+  let num = Math.floor(Math.random() * 898);
+
+  let data = await fetch(`${pokemon_api_url}${num}`);
+  let pokemonRawData = await data.json();
+
+  createPokemonCard(pokemonRawData);
+}
+
+// This function fecthing Pokemons. limit - how many pokemons you want to get. offset is id offset
+async function fetchPokemons(limit = 0, offset = 10) {
+  let data;
+  if (Number.isInteger(limit) && Number.isInteger(offset)) {
+    const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
+    let obj = await fetch(url);
+    data = await obj.json();
+
+    pokemon_arr = data.results;
+    pokemon_arr.forEach((elem) => {
+      fetchPokemonByID(elem);
+    });
+  } else return;
+}
+/*
+Above this comment we declare async functions
+*/
+////////////////////////////////////////////////////////
+/*
+Below this comment we functions
+*/
 function createPokemonCard(pokemonObj) {
   // Creating container for pokemon card
   const fragment = document.createDocumentFragment();
@@ -77,44 +117,33 @@ function makePokemonTypeLabels(types) {
   return temp;
 }
 
-// This function fecthing Pokemons. limit - how many pokemons you want to get. offset is id offset
-async function fetchPokemons(limit = 0, offset = 10) {
-  let data;
-  if (Number.isInteger(limit) && Number.isInteger(offset)) {
-    const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-    let obj = await fetch(url);
-    data = await obj.json();
-
-    pokemon_arr = data.results;
-    pokemon_arr.forEach((elem) => {
-      getPokemon(elem);
-    });
-  } else return;
-}
-
-// fetchPokemons();
-
-setTimeout(doIT, 2000);
-
-async function getPokemon(elem) {
-  let obj = await fetch(elem.url);
-  let pokemonData = await obj.json();
-
-  pokemon_real_arr.push(pokemonData);
-}
-
-function doIT() {
+function createPokemonCards() {
   for (let i = 0; i < pokemon_real_arr.length; i++) {
     createPokemonCard(pokemon_real_arr[i]);
     console.log("Creating pokemon");
   }
 }
 
+// returns [] of strings with Pokemon types
 function getPokemonTypes(pokemonObj) {
   let temp = [];
   pokemonObj.types.forEach((element) => {
     temp.push(element.type.name);
   });
-
   return temp;
 }
+/*
+Above this comment we declare functions
+*/
+////////////////////////////////////////////////////////
+/*
+Below this comment we make calls
+*/
+
+window.addEventListener("DOMContentLoaded", fetchRandomPokemon);
+window.addEventListener("click", () => {
+  numberOfClicks++;
+});
+
+// fetchPokemons(); Should be executed on search
+// setTimeout(doIT, 2000);
