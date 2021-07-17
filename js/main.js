@@ -91,7 +91,6 @@ function createPokemonCard(pokemonObj) {
   //Creating empty div behind the img to style background
   const epmtyDiv = document.createElement("div");
   card.appendChild(epmtyDiv);
-  epmtyDiv.style.height = 210;
   epmtyDiv.classList.add("circle-background");
 
   // Creating avatar for pokemon card from another API (cause png from there is way better)
@@ -99,7 +98,19 @@ function createPokemonCard(pokemonObj) {
   epmtyDiv.appendChild(img);
   img.width = 210;
   img.height = 210;
-  img.src = `${pokemon_img_endpoint}${pokemonObj.id}.png`;
+
+  (() => {
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", `${pokemon_img_endpoint}${pokemonObj.id}.png`);
+    xhr.onload = () => {
+      if (xhr.status === 404) {
+        img.src = `assets/uknown_pokemon.png`;
+      } else {
+        img.src = `${pokemon_img_endpoint}${pokemonObj.id}.png`;
+      }
+    };
+    xhr.send();
+  })();
 
   // Creating pokemon id
   let p = document.createElement("p");
