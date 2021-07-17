@@ -26,6 +26,21 @@
   --ice-color: #1d77cc;
 }
 
+header::after {
+  content: "*";
+  color: red;
+}
+
+/*
+I hate this way to position svg but I couldn't figure out how to it other way
+*/
+.search-svg {
+  position: relative;
+  pointer-events: none;
+  top: 3px;
+  left: 2px;
+}
+
 ::selection {
   background: #b8e2f3;
   color: rgb(44, 44, 44);
@@ -69,6 +84,11 @@ header {
   font-size: 18px;
   letter-spacing: 2px;
   font-weight: 100;
+}
+
+#input-search[type="text"]::placeholder:after {
+  content: "&*";
+  color: rgba(192, 5, 5, 0.616);
 }
 
 #input-btn {

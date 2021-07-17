@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="assets/favicon.ico" />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +12,6 @@
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/css2?family=Sarpanch&display=swap" rel="stylesheet"> 
-    <script src="https://kit.fontawesome.com/904665a92e.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/styles.css" />
     <title>Pokemon App</title>
   </head>
@@ -21,9 +20,13 @@
         <label for="search-input">Find your <span class="heart">&#x1F496</span> pokemon</label><br>
         <div id="wrapper">
           <div id="input-wrapper">
-            <button id="input-btn"><i class="fas fa-search"></i></button>
-          <input type="text" id="input-search" placeholder="Name, id or type..."/>
-                </div>
+            <button id="input-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.5 -2.5 24 24" width="35" height="35" preserveAspectRatio="xMinYMin" class="search-svg" fill="currentColor">
+              <path xmlns="http://www.w3.org/2000/svg" d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zm6.32-1.094l3.58 3.58a1 1 0 1 1-1.415 1.413l-3.58-3.58a8 8 0 1 1 1.414-1.414z"/>
+            </svg>
+           </button>
+           <input type="text" id="input-search" placeholder="Name, id or type..."/>
+          </div>
         </div>
     <section id="pokedex"></section>
   </body>
