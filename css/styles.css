@@ -26,6 +26,11 @@
   --ice-color: #1d77cc;
 }
 
+datalist {
+  font-size: 18px;
+  color: var(--electric-color);
+}
+
 header::after {
   content: "*";
   color: red;
