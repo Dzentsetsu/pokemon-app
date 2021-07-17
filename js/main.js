@@ -98,18 +98,21 @@ function createPokemonCard(pokemonObj) {
   epmtyDiv.appendChild(img);
   img.width = 210;
   img.height = 210;
+  img.style.visibility = "hidden";
 
-  (() => {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", `${pokemon_img_endpoint}${pokemonObj.id}.png`);
-    xhr.onload = () => {
-      if (xhr.status === 404) {
-        img.src = `assets/uknown_pokemon.png`;
-      } else {
-        img.src = `${pokemon_img_endpoint}${pokemonObj.id}.png`;
-      }
-    };
-    xhr.send();
+  setTimeout(() => {
+    img.style.visibility = "visible";
+  }, 1300);
+
+  (async () => {
+    let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
+    if (obj.status == 200) {
+      let blob = await obj.blob();
+      let url = await URL.createObjectURL(blob);
+      img.src = url;
+    } else {
+      img.src = `assets/uknown_pokemon.png`;
+    }
   })();
 
   // Creating pokemon id
