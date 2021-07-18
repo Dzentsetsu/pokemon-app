@@ -5,6 +5,31 @@ const pokemon_api_url = "https://pokeapi.co/api/v2/pokemon/";
 const pokemon_img_endpoint = "https://pokeres.bastionbot.org/images/pokemon/";
 const inputBtn = document.querySelector("#input-btn");
 const inputSearch = document.querySelector("#input-search");
+const dataList = document.querySelector('#pokemon-datalist');
+const pokemonNamesArray = {
+ 
+  data: null,
+  fetchData: () => {
+    fetch('data/pok-names-en.json').then(response => response.json()).then(pokemonNamesArray.saveData)
+  },
+   saveData: (data) => {
+    pokemonNamesArray.data = data;
+    pokemonNamesArray.dataSet = [...new Set(data)];
+  },
+  makeOptions: () => {
+    let fragment = document.createDocumentFragment();
+    for(let i = 0; i < pokemonNamesArray.data.length; i++) {
+      let temp = document.createElement('option');
+      if(i == 0) {
+        temp.selected = true;
+      }
+      temp.value,  temp.textContent = pokemonNamesArray.data[i];
+      fragment.appendChild(temp);
+    }
+    dataList.appendChild(fragment);
+    delete fragment;
+  }
+}
 /*
 Above this comment we global variables
 */
@@ -48,28 +73,6 @@ async function fetchPokemons(limit = 0, offset = 10) {
       fetchPokemonByID(elem);
     });
   } else return;
-}
-
-async function filterPokemonNamesArray(input, searchText) {
-  let temp = await fetch("data/pok-names-en.json");
-  let namesArr = await temp.json();
-
-  let result = namesArr.filter((name) => {
-    const regex = new RegExp(`${searchText}`, "i");
-
-    return name.match(regex);
-  });
-
-  let addToInputSearch = (searchText) => {
-    console.log(result);
-    if (result.length > 0) return result[0].substring(searchText.length);
-    return "";
-  };
-
-  if (searchText === "") return;
-  else {
-    input.value = `${searchText}${addToInputSearch(searchText)}`;
-  }
 }
 /*
 Above this comment we declare async functions
@@ -191,13 +194,6 @@ function submitData() {
 function searchPokemon() {
   console.log(`Fetching pokemon data`);
 }
-
-function autoComplete(event) {
-  if (event.target.value === "") return;
-  if (event.data === null) return;
-
-  filterPokemonNamesArray(event.target, event.target.value);
-}
 /*
 Above this comment we declare functions
 */
@@ -205,16 +201,11 @@ Above this comment we declare functions
 /*
 Below this comment we make calls
 */
-
 window.addEventListener("DOMContentLoaded", fetchRandomPokemon);
-
-inputSearch.addEventListener("input", () => autoComplete(event));
-inputSearch.addEventListener("keyup", ({ key }) => {
-  if (key === "Backspace") {
-    console.log("Backspace was pressed");
-  }
-});
+window.addEventListener("DOMContentLoaded", pokemonNamesArray.fetchData);
 inputBtn.addEventListener("click", submitData);
 
+setTimeout(() => {
+  pokemonNamesArray.makeOptions();
+}, 500);
 // fetchPokemons(); Should be executed on search
-// setTimeout(doIT, 2000);
