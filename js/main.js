@@ -7,7 +7,6 @@ const inputBtn = document.querySelector("#input-btn");
 const inputSearch = document.querySelector("#input-search");
 const dataList = document.querySelector('#pokemon-datalist');
 const pokemonNamesArray = {
- 
   data: null,
   fetchData: () => {
     fetch('data/pok-names-en.json').then(response => response.json()).then(pokemonNamesArray.saveData)
@@ -74,6 +73,17 @@ async function fetchPokemons(limit = 0, offset = 10) {
     });
   } else return;
 }
+async function searchPokemonByName(pokemonName) {
+  if(typeof pokemonName !== 'string') return;
+  let str = pokemonName.toLowerCase();
+  let obj = await fetch(`${pokemon_api_url}${str}`);
+  let responce = await obj.json();
+
+  createPokemonCard(responce)
+}
+async function searchPokemonById(pokemonId) {
+  if(typeof pokemonId !== 'number') throw new Error("Not a number")
+}
 /*
 Above this comment we declare async functions
 */
@@ -105,7 +115,7 @@ function createPokemonCard(pokemonObj) {
 
   setTimeout(() => {
     img.style.visibility = "visible";
-  }, 1300);
+  }, 1500);
 
   (async () => {
     let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
@@ -181,18 +191,31 @@ function submitData() {
     else value.trim();
     return true;
   };
-
+  let temp = validateInput(value);
   proccesedInputValue(value);
   if (proccesedInputValue) {
-    searchPokemon(value);
-    console.log(`Trimed value ${value}`);
+    searchPokemonByName(value);
   } else {
     console.log(`Incorrect input`);
   }
 }
 
-function searchPokemon() {
-  console.log(`Fetching pokemon data`);
+function validateInput(str) {
+  if(str === '' || typeof str !== 'string' || str === undefined || str === ' ') return;
+  let firstLetter = str[0].toUpperCase();
+  let tempPokemonName = firstLetter + str.substring(1);
+
+  let answer = pokemonNamesArray.data.includes(tempPokemonName);
+  return answer;
+}
+
+function isNumber(value) {
+  const temp = new RegExp('#?\d{0,3}');
+  console.log(value.match(temp));
+}
+
+function isString(value) {
+
 }
 /*
 Above this comment we declare functions
@@ -201,9 +224,33 @@ Above this comment we declare functions
 /*
 Below this comment we make calls
 */
-window.addEventListener("DOMContentLoaded", fetchRandomPokemon);
-window.addEventListener("DOMContentLoaded", pokemonNamesArray.fetchData);
-inputBtn.addEventListener("click", submitData);
+pokemonNamesArray.fetchData();
+window.addEventListener('DOMContentLoaded', fetchRandomPokemon);
+inputBtn.addEventListener("click", () => {
+  if(inputSearch.value !== "") {
+    let temp = validateInput(inputSearch.value);
+  
+    if(temp) {
+      submitData();
+    } else alert(`Such pokemon doesn't exist... It is probably a typo in search`)
+   
+}});
+
+document.addEventListener('keypress', (e) => {
+ isNumber(inputSearch.value);
+  if(e.key === 'Enter' && typeof inputSearch.value !== 'number') {
+  let temp = validateInput(inputSearch.value);
+
+  if(temp) {
+    submitData();
+  } else alert(`Such pokemon doesn't exist... It is probably a typo in search`)
+ 
+}
+
+if(e.key === 'Enter' && isNumber) {
+  searchPokemonById(inputSearch.value);
+}
+});
 
 setTimeout(() => {
   pokemonNamesArray.makeOptions();

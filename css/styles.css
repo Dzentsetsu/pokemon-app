@@ -29,6 +29,11 @@
 datalist {
   font-size: 18px;
   color: var(--electric-color);
+  opacity: 0.4;
+}
+
+input::-webkit-calendar-picker-indicator {
+  opacity: 100;
 }
 
 header::after {
@@ -146,9 +151,6 @@ label {
   font-size: 1.7rem;
 }
 
-/* #pokedex {
-  /* height: 100vh; */
-/*} */
 
 .circle-background {
   background: rgba(245, 222, 179, 0.555);
@@ -172,6 +174,11 @@ span {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.pokemon-card-container {
+  margin-bottom: 20px;
+  margin-right: 10px;
 }
 
 .grass {
