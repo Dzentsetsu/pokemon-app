@@ -171,20 +171,15 @@ function processSearchQuery(searchQuery) {
   if (searchQuery === '' || searchQuery === undefined || searchQuery === ' ' || searchQuery === null) return;
   searchQuery = searchQuery.trim();
 
-
-  let pokName = '';
   let existInArray = ((str) => {
     const firstLetter = str[0].toUpperCase();
     const tempPokemonName = firstLetter + str.substring(1);
-    pokName = tempPokemonName;
     const answer = pokemonNamesArray.data.includes(tempPokemonName);
-
     return answer;
   })(searchQuery);
 
   if (existInArray) {
-    console.log(`Name found in array`);
-    fetchPokemon(pokName);
+    fetchPokemon(searchQuery.toLowerCase());
     return;
   }
 
@@ -195,11 +190,13 @@ function processSearchQuery(searchQuery) {
     return;
   }
   if (!existInArray && !matchObj.match) {
-    fetchPokemon(matchObj.data)
+    // fetchPokemon(matchObj.data)
+    showErrorMessage();
     return;
   }
 
   else {
+    showErrorMessage();
     console.log(`Strange input, returning error`);
   }
 }
@@ -207,8 +204,6 @@ function processSearchQuery(searchQuery) {
 function matchRegex(searchQuery) {
   const regex = /^#?[0-9]{0,3}/;
   let tempStr = searchQuery.match(regex)[0];
-  console.log(searchQuery.match(regex))
-  console.dir(tempStr)
   if (tempStr[0] != null) {
     if (tempStr.charAt(0) === '#') {
       fixedStr = tempStr.slice(1);
@@ -224,6 +219,25 @@ function matchRegex(searchQuery) {
     match: false,
     data: '79'
   }
+}
+
+function showErrorMessage() {
+  const div = document.querySelector('.error');
+  div.innerHTML = `<strong>Error!  </strong>Such pokemon does not exist.`;
+  div.classList.add('show');
+  div.style.display = 'block';
+  div.classList.remove('error');
+
+  setTimeout(() => {
+    div.classList.remove('show');
+    div.classList.add('hide');
+  }, 3000)
+
+  setTimeout(() => {
+    div.classList.remove('hide');
+    div.classList.add('error');
+    div.style.display = 'none';
+  }, 4300)
 }
 /*
 Above this comment we declare functions
@@ -253,3 +267,5 @@ setTimeout(() => {
   pokemonNamesArray.makeOptions();
 }, 500);
 // fetchPokemons(); Should be executed on search
+
+
