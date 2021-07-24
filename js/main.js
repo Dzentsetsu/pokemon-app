@@ -11,18 +11,18 @@ const pokemonNamesArray = {
   fetchData: () => {
     fetch('data/pok-names-en.json').then(response => response.json()).then(pokemonNamesArray.saveData)
   },
-   saveData: (data) => {
+  saveData: (data) => {
     pokemonNamesArray.data = data;
     pokemonNamesArray.dataSet = [...new Set(data)];
   },
   makeOptions: () => {
     let fragment = document.createDocumentFragment();
-    for(let i = 0; i < pokemonNamesArray.data.length; i++) {
+    for (let i = 0; i < pokemonNamesArray.data.length; i++) {
       let temp = document.createElement('option');
-      if(i == 0) {
+      if (i == 0) {
         temp.selected = true;
       }
-      temp.value,  temp.textContent = pokemonNamesArray.data[i];
+      temp.value, temp.textContent = pokemonNamesArray.data[i];
       fragment.appendChild(temp);
     }
     dataList.appendChild(fragment);
@@ -37,52 +37,49 @@ Above this comment we global variables
 Below this comment we declare async functions
 */
 
-// This function fetches pokemon by specific id
-async function fetchPokemonByID(num) {
-  if (Number.isNaN(num)) return;
-  const url = pokemon_api_url + num;
-
-  const obj = await fetch(url);
-  const data = await obj.json();
-
-  console.log("creating poke");
-  createPokemonCard(data);
-}
-
 // This function fetching random pokemon on DOMContentLoaded
 async function fetchRandomPokemon() {
   let num = Math.floor(Math.random() * 898);
 
-  let data = await fetch(`${pokemon_api_url}${num}`);
-  let pokemonRawData = await data.json();
+  try {
+    let data = await fetch(`${pokemon_api_url}${num}`);
+    let pokemonData = await data.json();
 
-  createPokemonCard(pokemonRawData);
+    createPokemonCard(pokemonData);
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 // This function fecthing Pokemons. limit - how many pokemons you want to get. offset is id offset
 async function fetchPokemons(limit = 0, offset = 10) {
-  let data;
   if (Number.isInteger(limit) && Number.isInteger(offset)) {
     const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-    let obj = await fetch(url);
-    data = await obj.json();
 
-    pokemon_arr = data.results;
+    try {
+      let obj = await fetch(url);
+      let data = await obj.json();
+      pokemon_arr = data.results;
+    } catch (error) {
+      console.log(error)
+    }
     pokemon_arr.forEach((elem) => {
-      fetchPokemonByID(elem);
+      fetchPokemon(elem);
     });
-  } else return;
+  } else {
+    showErrorMessage('Wrong setting for limit or offset');
+    return;
+  }
 }
-async function searchPokemonByName(pokemonName) {
-  if(typeof pokemonName !== 'string') return;
-  let str = pokemonName.toLowerCase();
-  let obj = await fetch(`${pokemon_api_url}${str}`);
-  let responce = await obj.json();
 
-  createPokemonCard(responce)
-}
-async function searchPokemonById(pokemonId) {
-  if(typeof pokemonId !== 'number') throw new Error("Not a number")
+async function fetchPokemon(pokemonNameOrID) {
+  try {
+    let obj = await fetch(`${pokemon_api_url}${pokemonNameOrID}`);
+    let responce = await obj.json();
+    createPokemonCard(responce)
+  } catch (error) {
+    console.log(error)
+  }
 }
 /*
 Above this comment we declare async functions
@@ -118,13 +115,17 @@ function createPokemonCard(pokemonObj) {
   }, 1500);
 
   (async () => {
-    let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
-    if (obj.status == 200) {
-      let blob = await obj.blob();
-      let url = await URL.createObjectURL(blob);
-      img.src = url;
-    } else {
-      img.src = `assets/uknown_pokemon.png`;
+    try {
+      let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
+      if ((obj.status <= 200 && obj.status <= 299) || obj.status == 304) {
+        let blob = await obj.blob();
+        let url = await URL.createObjectURL(blob);
+        img.src = url;
+      } else {
+        img.src = `assets/uknown_pokemon.png`;
+      }
+    } catch (error) {
+      console.log(error)
     }
   })();
 
@@ -184,38 +185,81 @@ function getPokemonTypes(pokemonObj) {
   return temp;
 }
 
-function submitData() {
-  let value = document.querySelector("#input-search").value;
-  let proccesedInputValue = (value) => {
-    if (value === null || value === "" || value === undefined) return false;
-    else value.trim();
-    return true;
-  };
-  let temp = validateInput(value);
-  proccesedInputValue(value);
-  if (proccesedInputValue) {
-    searchPokemonByName(value);
-  } else {
-    console.log(`Incorrect input`);
+function processSearchQuery(searchQuery) {
+  if (searchQuery === '' || searchQuery === undefined || searchQuery === ' ' || searchQuery === null) return;
+  searchQuery = searchQuery.trim();
+
+  let existInArray = ((str) => {
+    const firstLetter = str[0].toUpperCase();
+    const tempPokemonName = firstLetter + str.substring(1);
+    const answer = pokemonNamesArray.data.includes(tempPokemonName);
+    return answer;
+  })(searchQuery);
+
+  if (existInArray) {
+    fetchPokemon(searchQuery.toLowerCase());
+    return;
+  }
+
+  let matchObj = matchRegex(searchQuery);
+
+  if (!existInArray && matchObj.match) {
+    fetchPokemon(matchObj.data);
+    return;
+  }
+  if (!existInArray && !matchObj.match) {
+    // fetchPokemon(matchObj.data)
+    showErrorMessage();
+    return;
+  }
+
+  else {
+    showErrorMessage();
+    console.log(`Strange input, returning error`);
   }
 }
 
-function validateInput(str) {
-  if(str === '' || typeof str !== 'string' || str === undefined || str === ' ') return;
-  let firstLetter = str[0].toUpperCase();
-  let tempPokemonName = firstLetter + str.substring(1);
-
-  let answer = pokemonNamesArray.data.includes(tempPokemonName);
-  return answer;
+function matchRegex(searchQuery) {
+  const regex = /^#?[0-9]{0,3}/;
+  let tempStr = searchQuery.match(regex)[0];
+  if (tempStr[0] != null) {
+    if (tempStr.charAt(0) === '#') {
+      fixedStr = tempStr.slice(1);
+      return {
+        match: true,
+        data: fixedStr
+      }
+    } else return {
+      match: true,
+      data: tempStr
+    }
+  } else return {
+    match: false,
+    data: '79'
+  }
 }
 
-function isNumber(value) {
-  const temp = new RegExp('#?\d{0,3}');
-  console.log(value.match(temp));
-}
+function showErrorMessage(str) {
+  const div = document.querySelector('.error');
 
-function isString(value) {
+  if (str !== null || str !== undefined) {
+    div.innerHTML = `<strong>Error!  </strong>Such pokemon does not exist.`;
+  } else div.innerHTML = `<strong>Error! </strong>${str}`;
 
+  div.classList.add('show');
+  div.style.display = 'block';
+  div.classList.remove('error');
+
+  setTimeout(() => {
+    div.classList.remove('show');
+    div.classList.add('hide');
+  }, 3000)
+
+  setTimeout(() => {
+    div.classList.remove('hide');
+    div.classList.add('error');
+    div.style.display = 'none';
+  }, 4300)
 }
 /*
 Above this comment we declare functions
@@ -226,33 +270,24 @@ Below this comment we make calls
 */
 pokemonNamesArray.fetchData();
 window.addEventListener('DOMContentLoaded', fetchRandomPokemon);
+
 inputBtn.addEventListener("click", () => {
-  if(inputSearch.value !== "") {
-    let temp = validateInput(inputSearch.value);
-  
-    if(temp) {
-      submitData();
-    } else alert(`Such pokemon doesn't exist... It is probably a typo in search`)
-   
-}});
+  if (inputSearch.value !== "") {
+    processSearchQuery(inputSearch.value);
+  }
+});
 
 document.addEventListener('keypress', (e) => {
- isNumber(inputSearch.value);
-  if(e.key === 'Enter' && typeof inputSearch.value !== 'number') {
-  let temp = validateInput(inputSearch.value);
-
-  if(temp) {
-    submitData();
-  } else alert(`Such pokemon doesn't exist... It is probably a typo in search`)
- 
-}
-
-if(e.key === 'Enter' && isNumber) {
-  searchPokemonById(inputSearch.value);
-}
+  if (e.key === 'Enter' && inputSearch.value.length !== 0) {
+    if (inputSearch.value !== "") {
+      processSearchQuery(inputSearch.value);
+    }
+  }
 });
 
 setTimeout(() => {
   pokemonNamesArray.makeOptions();
 }, 500);
 // fetchPokemons(); Should be executed on search
+
+
