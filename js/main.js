@@ -6,6 +6,7 @@ const pokemon_img_endpoint = "https://pokeres.bastionbot.org/images/pokemon/";
 const inputBtn = document.querySelector("#input-btn");
 const inputSearch = document.querySelector("#input-search");
 const dataList = document.querySelector('#pokemon-datalist');
+const clearBtn = document.querySelector('.clear-btn');
 const pokemonNamesArray = {
   data: null,
   fetchData: () => {
@@ -283,6 +284,10 @@ document.addEventListener('keypress', (e) => {
       processSearchQuery(inputSearch.value);
     }
   }
+});
+
+clearBtn.addEventListener('click', (e) => {
+inputSearch.value = "";
 });
 
 setTimeout(() => {
