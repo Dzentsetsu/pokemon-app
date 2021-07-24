@@ -128,7 +128,7 @@ function createPokemonCard(pokemonObj) {
         img.src = `assets/uknown_pokemon.png`;
       }
     } catch (error) {
-      console.log(error)
+      console.log('You still fine')
     }
   })();
 
@@ -230,7 +230,7 @@ function matchRegex(searchQuery) {
 
   let inputString, inputNumber;
 
-  if (isNaN(searchQuery)) {
+  if (isNaN(searchQuery) && searchQuery.charAt(0) !== '#') {
     inputString = searchQuery.match(regexString)[0];
     
     if (existInArray(inputString)) {
@@ -256,7 +256,7 @@ function matchRegex(searchQuery) {
     } else return doesNotExist;
   }
 }
-function showErrorMessage(str) {
+function showErrorMessage(str = 'Uknown pokemon') {
   inputBtn.disabled = true;
 
   errorDiv.innerHTML = `<strong>Error! </strong>${str}`;
@@ -312,7 +312,7 @@ clearBtn.addEventListener('click', (e) => {
 
 setTimeout(() => {
   pokemonNamesArray.makeOptions();
-}, 500);
+}, 300);
 // fetchPokemons(); Should be executed on search
 
 
