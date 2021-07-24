@@ -7,6 +7,8 @@ const inputBtn = document.querySelector("#input-btn");
 const inputSearch = document.querySelector("#input-search");
 const dataList = document.querySelector('#pokemon-datalist');
 const clearBtn = document.querySelector('.clear-btn');
+const errorDiv = document.querySelector('#error');
+
 const pokemonNamesArray = {
   data: null,
   fetchData: () => {
@@ -118,7 +120,7 @@ function createPokemonCard(pokemonObj) {
   (async () => {
     try {
       let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
-      if ((obj.status <= 200 && obj.status <= 299) || obj.status == 304) {
+      if ((obj.status <= 200 && obj.status <= 299)) {
         let blob = await obj.blob();
         let url = await URL.createObjectURL(blob);
         img.src = url;
@@ -187,80 +189,100 @@ function getPokemonTypes(pokemonObj) {
 }
 
 function processSearchQuery(searchQuery) {
-  if (searchQuery === '' || searchQuery === undefined || searchQuery === ' ' || searchQuery === null) return;
-  searchQuery = searchQuery.trim();
-
-  let existInArray = ((str) => {
-    const firstLetter = str[0].toUpperCase();
-    const tempPokemonName = firstLetter + str.substring(1);
-    const answer = pokemonNamesArray.data.includes(tempPokemonName);
-    return answer;
-  })(searchQuery);
-
-  if (existInArray) {
-    fetchPokemon(searchQuery.toLowerCase());
+  trimedQuery = searchQuery.trim();
+  if (trimedQuery === '' || trimedQuery.length === 0) {
+    showErrorMessage(`Empty search!!`)
     return;
   }
 
-  let matchObj = matchRegex(searchQuery);
+  let queryObject = matchRegex(trimedQuery);
 
-  if (!existInArray && matchObj.match) {
-    fetchPokemon(matchObj.data);
+  if (queryObject.data) {
+    fetchPokemon(queryObject.data);
     return;
   }
-  if (!existInArray && !matchObj.match) {
-    // fetchPokemon(matchObj.data)
-    showErrorMessage();
-    return;
-  }
-
   else {
-    showErrorMessage();
-    console.log(`Strange input, returning error`);
+    showErrorMessage(queryObject.errorMessage);
+    return;
   }
 }
 
 function matchRegex(searchQuery) {
-  const regex = /^#?[0-9]{0,3}/;
-  let tempStr = searchQuery.match(regex)[0];
-  if (tempStr[0] != null) {
-    if (tempStr.charAt(0) === '#') {
-      fixedStr = tempStr.slice(1);
-      return {
-        match: true,
-        data: fixedStr
-      }
-    } else return {
-      match: true,
-      data: tempStr
+  const regexNum = /^#?[0-9]{0,}/;
+  const regexString = /[a-zA-Z]+/;
+
+  let success, doesNotExist, wrongName;
+
+  success = {
+    data: undefined,
+    errorMessage: undefined
+  };
+
+  doesNotExist = {
+    data: undefined,
+    errorMessage: 'There is only 898 pokemons registered in National Pokedex'
+  };
+
+  wrongName = {
+    data: undefined,
+    errorMessage: 'Pokemon with this name does not exist'
+  }
+
+  let inputString, inputNumber;
+
+  if (isNaN(searchQuery)) {
+    inputString = searchQuery.match(regexString)[0];
+    
+    if (existInArray(inputString)) {
+      success.data = inputString.toLowerCase();
+      return success;
+    } else return wrongName;
+} else {
+    inputNumber = searchQuery.match(regexNum)[0];
+
+    if (inputNumber.charAt(0) === '#') {
+      inputNumber = inputNumber.slice(1);
+      if (inputNumber.length > 3) return doesNotExist;
+      success.data = inputNumber;
+      return success;
     }
-  } else return {
-    match: false,
-    data: '79'
+
+    if (typeof (+inputNumber) === 'number') {
+      if (inputNumber.length >= 4) return doesNotExist;
+      if (inputNumber.length <= 3) {
+        success.data = inputNumber;
+        return success;
+      }
+    } else return doesNotExist;
   }
 }
-
 function showErrorMessage(str) {
-  const div = document.querySelector('.error');
+  inputBtn.disabled = true;
 
-  if (str !== null || str !== undefined) {
-    div.innerHTML = `<strong>Error!  </strong>Such pokemon does not exist.`;
-  } else div.innerHTML = `<strong>Error! </strong>${str}`;
-
-  div.classList.add('show');
-  div.style.display = 'block';
-  div.classList.remove('error');
+  errorDiv.innerHTML = `<strong>Error! </strong>${str}`;
+  errorDiv.classList.remove('error');
+  errorDiv.classList.add('show');
 
   setTimeout(() => {
-    div.classList.remove('show');
-    div.classList.add('hide');
-  }, 3000)
+    errorDiv.classList.remove('show');
+    errorDiv.classList.add('hide');  
+  },1300);
+  
+  setTimeout(()=> {
+    errorDiv.classList.remove('hide');
+  },2600);
 
   setTimeout(() => {
-    div.classList.remove('hide');
-    div.classList.add('error');
-    div.style.display = 'none';
-  }, 4300)
+    inputBtn.disabled = false;
+    errorDiv.classList.add('error');
+  },2601);
+}
+
+function existInArray(str) {
+  const firstLetter = str[0].toUpperCase();
+  const tempPokemonName = firstLetter + str.substring(1);
+  const answer = pokemonNamesArray.data.includes(tempPokemonName);
+  return answer;
 }
 /*
 Above this comment we declare functions
@@ -273,21 +295,19 @@ pokemonNamesArray.fetchData();
 window.addEventListener('DOMContentLoaded', fetchRandomPokemon);
 
 inputBtn.addEventListener("click", () => {
-  if (inputSearch.value !== "") {
+  if (inputSearch.value.length !== 0) {
     processSearchQuery(inputSearch.value);
   }
 });
 
 document.addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && inputSearch.value.length !== 0) {
-    if (inputSearch.value !== "") {
-      processSearchQuery(inputSearch.value);
-    }
+    processSearchQuery(inputSearch.value);
   }
 });
 
 clearBtn.addEventListener('click', (e) => {
-inputSearch.value = "";
+  inputSearch.value = "";
 });
 
 setTimeout(() => {
