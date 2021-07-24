@@ -41,31 +41,45 @@ Below this comment we declare async functions
 async function fetchRandomPokemon() {
   let num = Math.floor(Math.random() * 898);
 
-  let data = await fetch(`${pokemon_api_url}${num}`);
-  let pokemonData = await data.json();
+  try {
+    let data = await fetch(`${pokemon_api_url}${num}`);
+    let pokemonData = await data.json();
 
-  createPokemonCard(pokemonData);
+    createPokemonCard(pokemonData);
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 // This function fecthing Pokemons. limit - how many pokemons you want to get. offset is id offset
 async function fetchPokemons(limit = 0, offset = 10) {
-  let data;
   if (Number.isInteger(limit) && Number.isInteger(offset)) {
     const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-    let obj = await fetch(url);
-    data = await obj.json();
 
-    pokemon_arr = data.results;
+    try {
+      let obj = await fetch(url);
+      let data = await obj.json();
+      pokemon_arr = data.results;
+    } catch (error) {
+      console.log(error)
+    }
     pokemon_arr.forEach((elem) => {
-      fetchPokemonByID(elem);
+      fetchPokemon(elem);
     });
-  } else return;
+  } else {
+    showErrorMessage('Wrong setting for limit or offset');
+    return;
+  }
 }
-async function fetchPokemon(pokemonNameOrID) {
-  let obj = await fetch(`${pokemon_api_url}${pokemonNameOrID}`);
-  let responce = await obj.json();
 
-  createPokemonCard(responce)
+async function fetchPokemon(pokemonNameOrID) {
+  try {
+    let obj = await fetch(`${pokemon_api_url}${pokemonNameOrID}`);
+    let responce = await obj.json();
+    createPokemonCard(responce)
+  } catch (error) {
+    console.log(error)
+  }
 }
 /*
 Above this comment we declare async functions
@@ -101,13 +115,17 @@ function createPokemonCard(pokemonObj) {
   }, 1500);
 
   (async () => {
-    let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
-    if (obj.status == 200) {
-      let blob = await obj.blob();
-      let url = await URL.createObjectURL(blob);
-      img.src = url;
-    } else {
-      img.src = `assets/uknown_pokemon.png`;
+    try {
+      let obj = await fetch(`${pokemon_img_endpoint}${pokemonObj.id}.png`);
+      if ((obj.status <= 200 && obj.status <= 299) || obj.status == 304) {
+        let blob = await obj.blob();
+        let url = await URL.createObjectURL(blob);
+        img.src = url;
+      } else {
+        img.src = `assets/uknown_pokemon.png`;
+      }
+    } catch (error) {
+      console.log(error)
     }
   })();
 
@@ -221,9 +239,13 @@ function matchRegex(searchQuery) {
   }
 }
 
-function showErrorMessage() {
+function showErrorMessage(str) {
   const div = document.querySelector('.error');
-  div.innerHTML = `<strong>Error!  </strong>Such pokemon does not exist.`;
+
+  if (str !== null || str !== undefined) {
+    div.innerHTML = `<strong>Error!  </strong>Such pokemon does not exist.`;
+  } else div.innerHTML = `<strong>Error! </strong>${str}`;
+
   div.classList.add('show');
   div.style.display = 'block';
   div.classList.remove('error');
