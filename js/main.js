@@ -152,7 +152,9 @@ function createPokemonCard(pokemonObj) {
     card.appendChild(labels[i]);
   }
 
-  pokedexSection.appendChild(fragment);
+  if(!pokedexSection.hasChildNodes()) {
+    pokedexSection.appendChild(fragment);
+  } else pokedexSection.insertBefore(fragment, pokedexSection.firstChild);
 }
 
 // Making Labels for every type this pokemon has
