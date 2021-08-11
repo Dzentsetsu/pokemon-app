@@ -106,6 +106,23 @@ function createPokemonCard(pokemonObj) {
   card.appendChild(epmtyDiv);
   epmtyDiv.classList.add("circle-background");
 
+  // Heart icon
+  const divSvg = document.createElement('div');
+  divSvg.classList.add('heart-container');
+  epmtyDiv.appendChild(divSvg);
+
+  const heartMain = document.createElement("svg");
+  heartMain.classList.add('heart-main');
+  heartMain.style.viewBox ="0 0 512 512";
+  heartMain.style.width = "100";
+  heartMain.style.title = "heart";
+  divSvg.appendChild(heartMain);
+
+  // const heartBack = document.createElement("svg");
+  // heartBack.classList.add("heart-background");
+  // heartBack.viewBox ="0 0 512 512";
+
+
   // Creating avatar for pokemon card from another API (cause png from there is way better)
   const img = document.createElement("img");
   epmtyDiv.appendChild(img);
@@ -128,7 +145,8 @@ function createPokemonCard(pokemonObj) {
         img.src = `assets/uknown_pokemon.png`;
       }
     } catch (error) {
-      console.log('You still fine')
+      img.src = `assets/uknown_pokemon.png`;
+      console.log('You still fine, I inserted uknown pokemon img, api with img data must be dead');
     }
   })();
 
@@ -143,6 +161,7 @@ function createPokemonCard(pokemonObj) {
   h5.classList.add("pokemon-name");
   h5.innerText = `${pokemonObj.name}`;
   card.appendChild(h5);
+
 
   // Creating Pokemon types
   const types = getPokemonTypes(pokemonObj);
@@ -316,5 +335,3 @@ setTimeout(() => {
   pokemonNamesArray.makeOptions();
 }, 300);
 // fetchPokemons(); Should be executed on search
-
-
